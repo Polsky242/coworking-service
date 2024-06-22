@@ -3,6 +3,7 @@ package ru.polskiy.model.entity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

@@ -46,7 +46,7 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
             workSpaces.put(userId,workspace);
             return workSpaces.get(userId);
         }else {
-            throw new IllegalArgumentException("Workspace with id:"+userId+" doesn't exist");//TODO написать исключение
+            throw new IllegalArgumentException("Workspace with id:"+userId+" doesn't exist");
         }
     }
 }

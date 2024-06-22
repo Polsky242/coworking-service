@@ -2,7 +2,9 @@ package ru.polskiy.dao.impl;
 
 import ru.polskiy.dao.UserDAO;
 import ru.polskiy.model.entity.User;
+import ru.polskiy.model.type.Role;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class UserDAOimpl implements UserDAO {
@@ -10,6 +12,18 @@ public class UserDAOimpl implements UserDAO {
     private final Map<Long, User> users =new HashMap<>();
 
     private Long id =1L;
+
+    public UserDAOimpl() {
+        save(
+                User.builder()
+                        .id(-1L)
+                        .login("Admin")
+                        .password("12345")
+                        .role(Role.ADMIN)
+                        .build()
+        );
+
+    }
 
     @Override
     public Optional<User> findById(Long id) {
@@ -45,8 +59,7 @@ public class UserDAOimpl implements UserDAO {
             users.put(userId,user);
             return users.get(userId);
         }else {
-            throw new IllegalArgumentException("User with id:"+userId+" doesn't exist");//TODO написать исключение
+            throw new IllegalArgumentException("User with id:"+userId+" doesn't exist");
         }
-
     }
 }

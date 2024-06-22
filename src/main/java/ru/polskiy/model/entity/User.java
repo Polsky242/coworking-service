@@ -4,11 +4,14 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.polskiy.model.type.Role;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User extends BaseEntity{
+
+    Long id;
 
     String login;
 
