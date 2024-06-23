@@ -4,6 +4,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.polskiy.model.type.Role;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -11,8 +13,12 @@ import ru.polskiy.model.type.Role;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User extends BaseEntity{
 
-    Long id;
-
+    public User(Long id, String login, String password, Role role) {
+        super(id);
+        this.login = login;
+        this.password = password;
+        this.role = role;
+    }
     String login;
 
     String password;

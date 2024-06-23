@@ -5,11 +5,17 @@ import ru.polskiy.exception.NoSuchWorkspaceException;
 import ru.polskiy.model.entity.Workspace;
 
 import java.rmi.NoSuchObjectException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class WorkspaceDAOimpl implements WorkspaceDAO {
 
     Long id =1L;
+
+
+    public WorkspaceDAOimpl() {
+
+    }
 
     Map<Long, Workspace> workSpaces=new HashMap<>();
 

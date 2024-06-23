@@ -59,6 +59,7 @@ public class MainHandler {
             outputData.errOutput("Нет рабочего пространства на эту дату и время");
         }
 
+
         outputData.output("Введите тип рабочего пространства");
         showAvailableWorkspaceTypes(outputData, controller);
         String workspaceTypeId = inputData.in().toString();

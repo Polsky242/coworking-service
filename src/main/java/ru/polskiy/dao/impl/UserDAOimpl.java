@@ -15,12 +15,7 @@ public class UserDAOimpl implements UserDAO {
 
     public UserDAOimpl() {
         save(
-                User.builder()
-                        .id(-1L)
-                        .login("Admin")
-                        .password("12345")
-                        .role(Role.ADMIN)
-                        .build()
+                new User(id,"Admin","12345",Role.ADMIN)
         );
 
     }
@@ -32,7 +27,7 @@ public class UserDAOimpl implements UserDAO {
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(users.values());
+        return Collections.unmodifiableList(new ArrayList<>(users.values()));
     }
 
     @Override

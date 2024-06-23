@@ -15,6 +15,10 @@ public abstract class BaseEntity {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 
+    public BaseEntity(Long id) {
+        this.id=id;
+    }
+
     /**
      * Sets the creation and update timestamps to the current time.
      * This method should be called when the entity is created.

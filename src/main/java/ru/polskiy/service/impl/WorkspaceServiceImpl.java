@@ -2,6 +2,7 @@ package ru.polskiy.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import ru.polskiy.dao.WorkspaceDAO;
+import ru.polskiy.exception.DuplicateException;
 import ru.polskiy.exception.NoSuchWorkspaceException;
 import ru.polskiy.model.entity.Workspace;
 import ru.polskiy.service.WorkspaceService;
@@ -41,12 +42,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public void deleteWorkSpaceById(Long id) {
-        List<Workspace> all = workspaceDAO.findAll();
-        Workspace workspace = all.get(id.intValue());
-        if (workspace==null){
+        Optional<Workspace> workspace = workspaceDAO.findById(id);
+        if (workspace.isEmpty()){
             throw new IllegalArgumentException();
         }else{
-            workspaceDAO.delete(workspace);
+            workspaceDAO.delete(workspace.get());
         }
     }
 
@@ -62,8 +62,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new NoSuchWorkspaceException("with id:"+workspaceId);
         }
         Workspace workspace = optionalWorkspace.get();
+        if(workspace.getUserId()!=null){
+            throw new DuplicateException(workspace.toString());
+        }
         workspace.setUserId(userId);
         workspace.setTypeId(workspaceTypeId);
+        workspaceDAO.save(workspace);
     }
 
     @Override
@@ -75,10 +79,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public List<Workspace> getWorkspacesByDate(Integer year, Integer month, Integer day, Integer hours, Integer minutes) {
-        return getAvailableWorkspaces().stream()
-                .filter(entity -> entity.getStartDate().getYear() == year)
-                .filter(entity -> entity.getStartDate().getMonth().getValue() == month)
-                .filter(entity -> entity.getStartDate().getDayOfMonth() == day)
+        return   getWorkspacesByDate(year, month, day).stream()
                 .filter(entity-> entity.getStartDate().getHour()==hours)
                 .filter(entity-> entity.getStartDate().getMinute()==minutes)
                 .collect(Collectors.toList());
@@ -99,6 +100,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         for (Workspace entity: allUserWorkspaces){
             if(entity.equals(workspace)){
                 entity.setUserId(null);
+                break;
             }
         }
     }

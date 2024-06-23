@@ -14,6 +14,14 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Workspace extends BaseEntity{
 
+    public Workspace(Long id, Long userId, LocalDateTime startDate, LocalDateTime endDate, Long typeId) {
+        super(id);
+        this.userId = userId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.typeId = typeId;
+    }
+
     @Builder.Default
     Long userId=null;
 
