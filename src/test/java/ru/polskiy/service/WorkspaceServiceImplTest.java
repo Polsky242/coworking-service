@@ -134,7 +134,7 @@ public class WorkspaceServiceImplTest {
                 .build();
         workspace.setId(1L);
         when(workspaceService.getCurrentWorkspaces(1L)).thenReturn(List.of(workspace));
-        workspaceService.cancelBook(1L,workspace);
+        workspaceService.cancelBook(1L, workspace);
         assertNull(workspace.getUserId());
     }
 }

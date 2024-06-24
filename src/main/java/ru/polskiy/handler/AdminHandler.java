@@ -111,6 +111,58 @@ public class AdminHandler {
     }
 
     /**
+     * Handles the deletion of a workspace identified by its ID.
+     *
+     * @param inputData   Input source for reading workspace ID.
+     * @param outputData  Output destination for displaying messages.
+     * @param controller  Main controller for accessing workspace deletion functionality.
+     */
+    public static void handleDeleteWorkspace(Input inputData, OutputData outputData, MainController controller) {
+        final String workspaceIdMessage = "Введите айди рабочего пространства:";
+        outputData.output(workspaceIdMessage);
+        Long workspaceId = Long.parseLong(inputData.in().toString());
+        controller.deleteWorkspace(workspaceId);
+    }
+
+    /**
+     * Handles the update of a workspace with new details.
+     *
+     * @param inputData   Input source for reading workspace details.
+     * @param outputData  Output destination for displaying messages.
+     * @param controller  Main controller for accessing workspace update functionality.
+     */
+    public static void handleUpdateWorkspace(Input inputData, OutputData outputData, MainController controller) {
+        final String workspaceTypeMessage = "Введите id рабочего пространства:";
+        outputData.output(workspaceTypeMessage);
+        String workspaceTypeId = inputData.in().toString();
+
+        final String startDateMessage = "Введите год, месяц, день, часы, минуты начала рабочего пространства, через пробел:";
+        outputData.output(startDateMessage);
+        List<String> startArr = new ArrayList<>(List.of(inputData.in().toString().split(" ")));
+        LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(startArr.get(0)),
+                Integer.parseInt(startArr.get(1)),
+                Integer.parseInt(startArr.get(2)),
+                Integer.parseInt(startArr.get(3)),
+                Integer.parseInt(startArr.get(4)));
+
+        final String endDateMessage = "Введите год, месяц, день, часы, минуты конца рабочего пространства, через пробел:";
+        outputData.output(endDateMessage);
+        List<String> endArr = new ArrayList<>(List.of(inputData.in().toString().split(" ")));
+        LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(endArr.get(0)),
+                Integer.parseInt(endArr.get(1)),
+                Integer.parseInt(endArr.get(2)),
+                Integer.parseInt(endArr.get(3)),
+                Integer.parseInt(endArr.get(4)));
+
+        controller.updateWorkspace(Workspace.builder()
+                .typeId(Long.parseLong(workspaceTypeId))
+                .startDate(startDate)
+                .endDate(endDate)
+                .build());
+    }
+
+
+    /**
      * Formats the user details into a readable string.
      *
      * @param user The user to format.

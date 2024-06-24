@@ -1,9 +1,7 @@
 package ru.polskiy.service;
 
-import ru.polskiy.dao.WorkspaceDAO;
 import ru.polskiy.model.entity.Workspace;
 
-import java.time.Duration;
 import java.util.List;
 
 public interface WorkspaceService {

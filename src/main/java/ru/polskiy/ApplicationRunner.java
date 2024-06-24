@@ -108,8 +108,10 @@ public class ApplicationRunner {
                 2. Получить весь список рабочих пространств.
                 3. Добавить новый тип рабочего пространства.
                 4. Добавить новое рабочее пространство.
-                5. Выйти с аккаунта.
-                6. Завершить программу.
+                5. Удалить рабочее пространство.
+                6. Обновить рабочее пространство.
+                7. Выйти с аккаунта.
+                8. Завершить программу.
                 """;
 
         while (true) {
@@ -129,9 +131,15 @@ public class ApplicationRunner {
                 AdminHandler.handleAddWorkspace(inputData, outputData, controller);
                 break;
             } else if (input.equals("5")) {
-                userLocation = UserLocation.SECURITY;
+                AdminHandler.handleDeleteWorkspace(inputData, outputData, controller);
                 break;
             } else if (input.equals("6")) {
+                AdminHandler.handleUpdateWorkspace(inputData,outputData,controller);
+                break;
+            } else if (input.equals("7")) {
+                userLocation = UserLocation.SECURITY;
+                break;
+            } else if (input.equals("8")) {
                 userLocation = UserLocation.EXIT;
                 break;
             } else {
