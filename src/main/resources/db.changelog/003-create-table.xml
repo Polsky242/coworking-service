@@ -29,8 +29,8 @@
         <sql>COMMENT ON COLUMN develop.users.id IS 'user id';</sql>
         <sql>COMMENT ON COLUMN develop.users.login IS 'user login';</sql>
         <sql>COMMENT ON COLUMN develop.users.registration_date IS 'registration date';</sql>
-        <sql>COMMENT ON COLUMN develop.users.password IS "users's password";</sql>
-        <sql>COMMENT ON COLUMN develop.users.role IS "user's role";</sql>
+        <sql>COMMENT ON COLUMN develop.users.password IS 'user password';</sql>
+        <sql>COMMENT ON COLUMN develop.users.role IS 'user role';</sql>
         <sql>COMMENT ON COLUMN develop.users.update_date IS 'updating date';</sql>
     </changeSet>
 
@@ -49,7 +49,7 @@
 
     <changeSet id="3" author="polsky">
         <createTable schemaName="develop" tableName="workspace">
-            <column name="id" type="bigint" defaultValueComputed="nextval('workspace_id_seq')">
+            <column name="id" type="bigint" defaultValueComputed="nextval('develop.workspace_id_seq')">
                 <constraints primaryKey="true" primaryKeyName="workspace_pkey" nullable="false"/>
             </column>
             <column name="start_date" type="timestamp">
