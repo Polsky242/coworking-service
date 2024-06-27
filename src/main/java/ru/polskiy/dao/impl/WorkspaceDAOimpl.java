@@ -1,29 +1,23 @@
 package ru.polskiy.dao.impl;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.polskiy.dao.WorkspaceDAO;
 import ru.polskiy.exception.NoSuchWorkspaceException;
 import ru.polskiy.model.entity.Workspace;
+import ru.polskiy.util.ConnectionManager;
 
-import java.rmi.NoSuchObjectException;
-import java.time.LocalDateTime;
-import java.util.*;
-
+import java.sql.*;
 import java.util.*;
 
 /**
  * Implementation of the WorkspaceDAO interface that manages workspace data using a HashMap.
  */
+@RequiredArgsConstructor
+@Slf4j
 public class WorkspaceDAOimpl implements WorkspaceDAO {
 
-    private Long id = 1L;
-
-    private final Map<Long, Workspace> workSpaces = new HashMap<>();
-
-    /**
-     * Constructs a WorkspaceDAOimpl object.
-     */
-    public WorkspaceDAOimpl() {
-    }
+    private final ConnectionManager connectionProvider;
 
     /**
      * Retrieves a workspace by its ID.
@@ -33,7 +27,20 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
      */
     @Override
     public Optional<Workspace> findById(Long id) {
-        return Optional.ofNullable(workSpaces.get(id));
+        String sqlFindById = """
+                SELECT * FROM develop.workspace WHERE id = ?
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlFindById)) {
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next() ?
+                    Optional.of(buildWorkspace(resultSet))
+                    : Optional.empty();
+        } catch (SQLException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -43,7 +50,20 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
      */
     @Override
     public List<Workspace> findAll() {
-        return new ArrayList<>(workSpaces.values());
+        String sqlFindAll = """
+                SELECT * FROM develop.workspace
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlFindAll)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Workspace> result = new ArrayList<>();
+            while (resultSet.next()) {
+                result.add(buildWorkspace(resultSet));
+            }
+            return result;
+        } catch (SQLException e) {
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -54,23 +74,47 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
      */
     @Override
     public Workspace save(Workspace entity) {
-        entity.setId(id++);
-        workSpaces.put(entity.getId(), entity);
-        return workSpaces.get(entity.getId());
+        String sqlSave = """
+                INSERT INTO develop.workspace (start_date, end_date, type_id, user_id,create_date,update_date)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlSave, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(entity.getStartDate()));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(entity.getEndDate()));
+            preparedStatement.setLong(3, entity.getTypeId());
+            preparedStatement.setLong(4, entity.getUserId());
+            preparedStatement.setTimestamp(5, Timestamp.valueOf(entity.getCreatedAt()));
+            preparedStatement.setTimestamp(6, Timestamp.valueOf(entity.getCreatedAt()));
+            preparedStatement.executeUpdate();
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                long id = generatedKeys.getLong(1);
+                if (id != 0) {
+                    entity.setId(id);
+                } else {
+                    throw new RuntimeException("Failed to generate ID for workspace");
+                }
+            }
+            return entity;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to save workspace", e);
+        }
     }
 
-    /**
-     * Deletes a workspace from the DAO.
-     *
-     * @param workspace The Workspace object to delete.
-     * @throws NoSuchWorkspaceException If the specified workspace doesn't exist in the DAO.
-     */
+
     @Override
-    public void delete(Workspace workspace) {
-        if (workSpaces.containsValue(workspace)) {
-            workSpaces.remove(workspace.getId());
-        } else {
-            throw new NoSuchWorkspaceException(workspace.toString());
+    public boolean delete(Long id) {
+        String sqlDelete = """
+                DELETE FROM develop.workspace WHERE id = ?;
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlDelete)) {
+            preparedStatement.setLong(1, id);
+            return preparedStatement.executeUpdate()>0;
+        } catch (SQLException e) {
+            log.error("Ошибка при выполнении SQL-запроса: " + e.getMessage());
+            return false;
         }
     }
 
@@ -83,12 +127,38 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
      */
     @Override
     public Workspace update(Workspace workspace) {
-        Long workspaceId = workspace.getId();
-        if (workSpaces.containsKey(workspaceId)) {
-            workSpaces.put(workspaceId, workspace);
-            return workSpaces.get(workspaceId);
-        } else {
-            throw new IllegalArgumentException("Workspace with id:" + workspaceId + " doesn't exist");
+        String sqlUpdate = """
+                UPDATE develop.workspace
+                SET start_date = ?,  end_date= ?, type_id = ?, user_id = ?,update_date= ?
+                WHERE id = ?;
+                """;
+
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlUpdate)) {
+
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(workspace.getStartDate()));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(workspace.getStartDate()));
+            preparedStatement.setLong(3,workspace.getTypeId() );
+            preparedStatement.setLong(4, workspace.getUserId());
+            preparedStatement.setTimestamp(5, Timestamp.valueOf(workspace.getUpdatedAt()));
+
+            preparedStatement.executeUpdate();
+            return workspace;
+        } catch (SQLException e) {
+            log.error("Ошибка при выполнении SQL-запроса: " + e.getMessage());
+            return null;
         }
+    }
+    private Workspace buildWorkspace(ResultSet resultSet) throws SQLException {
+        Workspace workspace = Workspace.builder()
+                .startDate(resultSet.getTimestamp("start_date").toLocalDateTime())
+                .endDate(resultSet.getTimestamp("end_date").toLocalDateTime())
+                .typeId(resultSet.getLong("type_id"))
+                .userId(resultSet.getLong("user_id"))
+                .build();
+        workspace.setId(resultSet.getLong("id"));
+        workspace.setCreatedAt(resultSet.getTimestamp("create_date").toLocalDateTime());
+        workspace.setUpdatedAt(resultSet.getTimestamp("update_date").toLocalDateTime());
+        return workspace;
     }
 }

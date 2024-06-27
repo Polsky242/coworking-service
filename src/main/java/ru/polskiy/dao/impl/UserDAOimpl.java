@@ -1,9 +1,12 @@
 package ru.polskiy.dao.impl;
 
+import lombok.RequiredArgsConstructor;
 import ru.polskiy.dao.UserDAO;
 import ru.polskiy.model.entity.User;
 import ru.polskiy.model.type.Role;
+import ru.polskiy.util.ConnectionManager;
 
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -12,18 +15,10 @@ import java.util.*;
 /**
  * Implementation of the UserDAO interface that manages user data using a HashMap.
  */
+@RequiredArgsConstructor
 public class UserDAOimpl implements UserDAO {
 
-    private final Map<Long, User> users = new HashMap<>();
-
-    private Long id = 1L;
-
-    /**
-     * Constructs a UserDAOimpl object and initializes it with an initial admin user.
-     */
-    public UserDAOimpl() {
-        save(new User(id, "Admin", "12345", Role.ADMIN));
-    }
+    private final ConnectionManager connectionProvider;
 
     /**
      * Retrieves a user by their ID.
@@ -33,7 +28,20 @@ public class UserDAOimpl implements UserDAO {
      */
     @Override
     public Optional<User> findById(Long id) {
-        return Optional.ofNullable(users.get(id));
+        String sqlFindById = """
+                SELECT * FROM develop.users WHERE id = ?
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlFindById)) {
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next() ?
+                    Optional.of(buildUser(resultSet))
+                    : Optional.empty();
+        } catch (SQLException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -43,7 +51,23 @@ public class UserDAOimpl implements UserDAO {
      */
     @Override
     public List<User> findAll() {
-        return Collections.unmodifiableList(new ArrayList<>(users.values()));
+        String sqlFindAll = """
+                SELECT * FROM develop.users;
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlFindAll)) {
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<User> users = new ArrayList<>();
+
+            while (resultSet.next()) {
+                users.add(buildUser(resultSet));
+            }
+
+            return users;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve all users", e);
+        }
     }
 
     /**
@@ -54,9 +78,23 @@ public class UserDAOimpl implements UserDAO {
      */
     @Override
     public User save(User entity) {
-        entity.setId(id++);
-        users.put(entity.getId(), entity);
-        return users.get(entity.getId());
+        String sqlSave = """
+                INSERT INTO develop.users (login, password, registration_date, role,update_date) VALUES (?, ?, ?, ?, ?)
+                """;
+
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlSave)) {
+            preparedStatement.setString(1, entity.getLogin());
+            preparedStatement.setString(2, entity.getPassword());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getCreatedAt()));
+            preparedStatement.setString(4, entity.getRole().toString());
+            preparedStatement.setTimestamp(5, Timestamp.valueOf(entity.getUpdatedAt()));
+            preparedStatement.executeUpdate();
+
+            return findByLogin(entity.getLogin()).orElse(entity);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to save user", e);
+        }
     }
 
     /**
@@ -67,12 +105,20 @@ public class UserDAOimpl implements UserDAO {
      */
     @Override
     public Optional<User> findByLogin(String login) {
-        for (User user : users.values()) {
-            if (user.getLogin().equals(login)) {
-                return Optional.of(user);
-            }
+        String sqlFindByLogin = """
+                SELECT * FROM develop.users WHERE login = ?
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlFindByLogin)) {
+            preparedStatement.setString(1, login);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next() ?
+                    Optional.of(buildUser(resultSet))
+                    : Optional.empty();
+        } catch (SQLException e) {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     /**
@@ -84,12 +130,31 @@ public class UserDAOimpl implements UserDAO {
      */
     @Override
     public User update(User user) {
-        Long userId = user.getId();
-        if (users.containsKey(userId)) {
-            users.put(userId, user);
-            return users.get(userId);
-        } else {
-            throw new IllegalArgumentException("User with id:" + userId + " doesn't exist");
+        String sqlUpdate = """
+                UPDATE develop.users SET login = ?, password = ?, update_date = ? WHERE id = ?
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlUpdate)) {
+            preparedStatement.setString(1, user.getLogin());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(user.getUpdatedAt()));
+            preparedStatement.setLong(4, user.getId());
+            preparedStatement.executeUpdate();
+            return user;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update user", e);
         }
+    }
+
+    private User buildUser(ResultSet resultSet) throws SQLException {
+        User user = User.builder()
+                .login(resultSet.getString("login"))
+                .role(Role.valueOf(resultSet.getString("role")))
+                .password(resultSet.getString("password"))
+                .build();
+        user.setId(resultSet.getLong("id"));
+        user.setCreatedAt(resultSet.getTimestamp("registration_date").toLocalDateTime());
+        user.setUpdatedAt(resultSet.getTimestamp("update_date").toLocalDateTime());
+        return user;
     }
 }
