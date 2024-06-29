@@ -7,16 +7,13 @@ import ru.polskiy.model.type.Role;
 import ru.polskiy.util.ConnectionManager;
 
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.*;
-
 import java.util.*;
 
 /**
  * Implementation of the UserDAO interface that manages user data using a HashMap.
  */
 @RequiredArgsConstructor
-public class UserDAOimpl implements UserDAO {
+public class UserDaoImpl implements UserDAO {
 
     private final ConnectionManager connectionProvider;
 
@@ -45,9 +42,9 @@ public class UserDAOimpl implements UserDAO {
     }
 
     /**
-     * Retrieves all users stored in the DAO.
+     * Retrieves all users stored.
      *
-     * @return An unmodifiable list of all users.
+     * @return A list containing all User entities stored in the in-memory map.
      */
     @Override
     public List<User> findAll() {
@@ -71,7 +68,7 @@ public class UserDAOimpl implements UserDAO {
     }
 
     /**
-     * Saves a new user or updates an existing user in the DAO.
+     * Saves a new user or updates an existing user.
      *
      * @param entity The User object to save or update.
      * @return The saved or updated User object.
@@ -122,11 +119,11 @@ public class UserDAOimpl implements UserDAO {
     }
 
     /**
-     * Updates an existing user in the DAO.
+     * Updates an existing user.
      *
      * @param user The updated User object.
      * @return The updated User object.
-     * @throws IllegalArgumentException If the user with the provided ID doesn't exist.
+     * @throws  SQLException id user with such id not exist
      */
     @Override
     public User update(User user) {
@@ -146,6 +143,16 @@ public class UserDAOimpl implements UserDAO {
         }
     }
 
+    /**
+     * Constructs a User object from the given ResultSet.
+     *
+     * This method extracts the user details from the provided ResultSet and
+     * constructs a User object using the extracted data.
+     *
+     * @param resultSet The ResultSet containing the user data retrieved from the database.
+     * @return A User object with data from the ResultSet.
+     * @throws SQLException if there is an error accessing the data in the ResultSet.
+     */
     private User buildUser(ResultSet resultSet) throws SQLException {
         User user = User.builder()
                 .login(resultSet.getString("login"))

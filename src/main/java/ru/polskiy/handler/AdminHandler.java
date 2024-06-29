@@ -88,7 +88,6 @@ public class AdminHandler {
                 .startDate(startDate)
                 .endDate(endDate)
                 .build());
-
     }
 
     /**
@@ -160,7 +159,6 @@ public class AdminHandler {
                 .endDate(endDate)
                 .build());
     }
-
 
     /**
      * Formats the user details into a readable string.

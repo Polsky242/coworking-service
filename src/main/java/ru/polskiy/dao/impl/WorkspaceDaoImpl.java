@@ -3,7 +3,6 @@ package ru.polskiy.dao.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.polskiy.dao.WorkspaceDAO;
-import ru.polskiy.exception.NoSuchWorkspaceException;
 import ru.polskiy.model.entity.Workspace;
 import ru.polskiy.util.ConnectionManager;
 
@@ -15,7 +14,7 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class WorkspaceDAOimpl implements WorkspaceDAO {
+public class WorkspaceDaoImpl implements WorkspaceDAO {
 
     private final ConnectionManager connectionProvider;
 
@@ -44,7 +43,7 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
     }
 
     /**
-     * Retrieves all workspaces stored in the DAO.
+     * Retrieves all workspaces.
      *
      * @return A list of all workspaces.
      */
@@ -67,7 +66,7 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
     }
 
     /**
-     * Saves a new workspace or updates an existing workspace in the DAO.
+     * Saves a new workspace or updates an existing workspace.
      *
      * @param entity The Workspace object to save or update.
      * @return The saved or updated Workspace object.
@@ -83,7 +82,7 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
             preparedStatement.setTimestamp(1, Timestamp.valueOf(entity.getStartDate()));
             preparedStatement.setTimestamp(2, Timestamp.valueOf(entity.getEndDate()));
             preparedStatement.setLong(3, entity.getTypeId());
-            preparedStatement.setLong(4, entity.getUserId());
+            preparedStatement.setObject(4, entity.getUserId());
             preparedStatement.setTimestamp(5, Timestamp.valueOf(entity.getCreatedAt()));
             preparedStatement.setTimestamp(6, Timestamp.valueOf(entity.getCreatedAt()));
             preparedStatement.executeUpdate();
@@ -102,7 +101,14 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
         }
     }
 
-
+    /**
+     * Deletes a user by their ID.
+     *
+     * This method deletes a user from the database based on the provided user ID.
+     *
+     * @param id The ID of the user to delete.
+     * @return true if the user was successfully deleted, otherwise false.
+     */
     @Override
     public boolean delete(Long id) {
         String sqlDelete = """
@@ -119,7 +125,7 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
     }
 
     /**
-     * Updates an existing workspace in the DAO.
+     * Updates an existing workspace.
      *
      * @param workspace The updated Workspace object.
      * @return The updated Workspace object.
@@ -141,6 +147,7 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
             preparedStatement.setLong(3,workspace.getTypeId() );
             preparedStatement.setLong(4, workspace.getUserId());
             preparedStatement.setTimestamp(5, Timestamp.valueOf(workspace.getUpdatedAt()));
+            preparedStatement.setLong(6, workspace.getId());
 
             preparedStatement.executeUpdate();
             return workspace;
@@ -149,6 +156,17 @@ public class WorkspaceDAOimpl implements WorkspaceDAO {
             return null;
         }
     }
+
+    /**
+     * Constructs a Workspace object from the given ResultSet.
+     *
+     * This method extracts the workspace details from the provided ResultSet and
+     * constructs a User object using the extracted data.
+     *
+     * @param resultSet The ResultSet containing the workspace data retrieved from the database.
+     * @return A Workspace object with data from the ResultSet.
+     * @throws SQLException if there is an error accessing the data in the ResultSet.
+     */
     private Workspace buildWorkspace(ResultSet resultSet) throws SQLException {
         Workspace workspace = Workspace.builder()
                 .startDate(resultSet.getTimestamp("start_date").toLocalDateTime())

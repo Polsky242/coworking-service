@@ -8,6 +8,5 @@ import lombok.Getter;
 public class SecurityWrapper {
 
     private String login;
-
     private String password;
 }

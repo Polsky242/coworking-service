@@ -18,6 +18,12 @@ public class LiquibaseInstance {
      * A singleton instance of the `LiquibaseInstance` class.
      */
     private static final LiquibaseInstance liquibaseInstance = new LiquibaseInstance();
+
+    /**
+     * Sql code that creates schema for Liquibase changelog
+     *
+     * Create when execute this class
+     */
     private static final String SQL_CREATE_SCHEMA = "CREATE SCHEMA IF NOT EXISTS migration";
 
     /**

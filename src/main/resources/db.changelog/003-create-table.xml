@@ -62,7 +62,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="bigint">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="create_date" type="timestamp">
                 <constraints nullable="false"/>
