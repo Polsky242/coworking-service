@@ -12,7 +12,7 @@ public interface WorkspaceService {
 
     List<Workspace> getAllWorkSpaces();
 
-    void deleteWorkSpaceById(Long id);
+    Boolean deleteWorkSpaceById(Long id);
 
     Workspace updateWorkspace(Workspace workspace);
 

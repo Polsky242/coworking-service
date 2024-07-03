@@ -96,7 +96,7 @@ public class MainHandler {
      * @param outputData The output data provider.
      * @param controller The main controller for handling business logic.
      */
-    public static void handleAvailableWorkspacesForSpecificDate(Input inputData, OutputData outputData, MainController controller) {
+    public static void handleAvailableWorkspacesForDay(Input inputData, OutputData outputData, MainController controller) {
         final String yearMessage = "Введите год:";
         outputData.output(yearMessage);
         String year = inputData.in().toString();

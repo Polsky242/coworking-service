@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="polsky">
+        <createTable schemaName="develop" tableName="users">
+            <column name="id" type="bigint" defaultValueComputed="nextval('develop.user_id_seq')" remarks="user id">
+                <constraints primaryKey="true" primaryKeyName="user_pkey" nullable="false"/>
+            </column>
+            <column name="login" type="varchar(255)" remarks="user login">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)" remarks="user password">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="varchar(255)" remarks="user role">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registration_date" type="timestamp" remarks="registration date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="timestamp" remarks="updating date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="polsky">
+        <createTable schemaName="develop" tableName="workspace_type">
+            <column name="id" type="bigint" defaultValueComputed="nextval('develop.workspace_type_id_seq')" remarks="workspace type id">
+                <constraints primaryKey="true" primaryKeyName="workspace_type_pkey" nullable="false"/>
+            </column>
+            <column name="type_name" type="varchar(255)" remarks="workspace type name">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="polsky">
+        <createTable schemaName="develop" tableName="workspace">
+            <column name="id" type="bigint" defaultValueComputed="nextval('develop.workspace_id_seq')" remarks="workspace id">
+                <constraints primaryKey="true" primaryKeyName="workspace_pkey" nullable="false"/>
+            </column>
+            <column name="start_date" type="timestamp" remarks="start date of rent">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="timestamp" remarks="end date of rent">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_id" type="bigint" remarks="type id">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint" remarks="user id">
+                <constraints nullable="true"/>
+            </column>
+            <column name="create_date" type="timestamp" remarks="creation date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="timestamp" remarks="updating date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

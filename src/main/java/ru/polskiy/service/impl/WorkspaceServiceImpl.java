@@ -34,7 +34,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public List<Workspace> getAvailableWorkspaces() {
         List<Workspace> all = workspaceDAO.findAll();
         return all.stream()
-                .filter(workspace -> workspace.getUserId() == null)
+                .filter(workspace -> workspace.getUserId() == 0)
                 .collect(Collectors.toList());
     }
 
@@ -48,7 +48,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public List<Workspace> getBookedWorkSpaces() {
         List<Workspace> all = workspaceDAO.findAll();
         return all.stream()
-                .filter(workspace -> workspace.getUserId() != null)
+                .filter(workspace -> workspace.getUserId() != 0)
                 .collect(Collectors.toList());
     }
 
@@ -69,13 +69,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param id the ID of the workspace to delete
      */
     @Override
-    public void deleteWorkSpaceById(Long id) {
+    public Boolean deleteWorkSpaceById(Long id) {
         Optional<Workspace> workspace = workspaceDAO.findById(id);
         if (workspace.isEmpty()) {
             throw new IllegalArgumentException();
-        } else {
-            workspaceDAO.delete(workspace.get());
         }
+        return workspaceDAO.delete(id);
+
     }
 
     /**
@@ -86,6 +86,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      */
     @Override
     public Workspace updateWorkspace(Workspace workspace) {
+        workspace.onUpdate();
         return workspaceDAO.update(workspace);
     }
 
@@ -105,12 +106,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new NoSuchWorkspaceException("with id:" + workspaceId);
         }
         Workspace workspace = optionalWorkspace.get();
-        if (workspace.getUserId() != null) {
+        if (workspace.getUserId() != 0) {
             throw new DuplicateException(workspace.toString());
         }
         workspace.setUserId(userId);
         workspace.setTypeId(workspaceTypeId);
-        workspaceDAO.save(workspace);
+        workspaceDAO.update(workspace);
     }
 
     /**
@@ -172,7 +173,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         List<Workspace> allUserWorkspaces = getCurrentWorkspaces(userId);
         for (Workspace entity : allUserWorkspaces) {
             if (entity.equals(workspace)) {
-                entity.setUserId(null);
+                entity.setUserId(0L);
                 break;
             }
         }
@@ -185,6 +186,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      */
     @Override
     public void addWorkspace(Workspace workspace) {
+        workspace.onCreate();
         workspaceDAO.save(workspace);
     }
 }

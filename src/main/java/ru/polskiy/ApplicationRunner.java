@@ -54,6 +54,7 @@ public class ApplicationRunner {
                 log.warn(e.getMessage());
                 outputData.errOutput(e.getMessage());
             } catch (RuntimeException e) {
+                e.printStackTrace();
                 log.error(e.getMessage());
                 outputData.errOutput("Unknown error. More details " + e.getMessage());
                 processIsRun = false;
@@ -160,7 +161,7 @@ public class ApplicationRunner {
                 Введите одно число без пробелов и других символов:
                 1. Получение забронированных рабочих пространств.
                 2. Бронирование.
-                3. Просмотр свободных рабочих пространств за конкретный месяц.
+                3. Просмотр свободных рабочих пространств за конкретный день.
                 4. Просмотр всех рабочих пространств.
                 5. Отменить бронь.
                 6. Выйти с аккаунта.
@@ -176,7 +177,7 @@ public class ApplicationRunner {
             } else if (input.equals("2")) {
                 MainHandler.handleWorkspaceSubmission(inputData, outputData, controller);
             } else if (input.equals("3")) {
-                MainHandler.handleAvailableWorkspacesForSpecificDate(inputData, outputData, controller);
+                MainHandler.handleAvailableWorkspacesForDay(inputData, outputData, controller);
             } else if (input.equals("4")) {
                 MainHandler.handleAvailableWorkspaces(outputData, controller);
             } else if (input.equals("5")) {

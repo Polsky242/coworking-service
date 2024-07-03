@@ -1,5 +1,6 @@
 package ru.polskiy.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +28,7 @@ public class SecurityServiceImplTest {
     private UserDAO userDAO;
 
     @Test
+    @DisplayName("check if registration of new user success")
     void testRegister_Success() {
         String login = "login";
         String password = "password";
@@ -43,6 +45,7 @@ public class SecurityServiceImplTest {
     }
 
     @Test
+    @DisplayName("check if registration throws RegisterExcepton")
     void testRegister_ThrowException() {
         String login = "login";
         String password = "password";
@@ -71,6 +74,7 @@ public class SecurityServiceImplTest {
     }
 
     @Test
+    @DisplayName("if user is empty authorization throws AuthorizeException")
     void testAuthorization_ThrowException() {
         String login = "login";
         String password = "password";
