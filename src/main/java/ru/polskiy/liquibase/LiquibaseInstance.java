@@ -35,7 +35,7 @@ public class LiquibaseInstance {
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             database.setLiquibaseSchemaName("migration");
 
-            Liquibase liquibase = new Liquibase("db.changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
+            Liquibase liquibase = new Liquibase("liquibase.migration_path", new ClassLoaderResourceAccessor(), database);
             liquibase.update();
             System.out.println("Migration completed");
 

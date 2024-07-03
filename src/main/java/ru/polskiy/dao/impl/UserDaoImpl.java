@@ -1,6 +1,7 @@
 package ru.polskiy.dao.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.polskiy.dao.UserDAO;
 import ru.polskiy.model.entity.User;
 import ru.polskiy.model.type.Role;
@@ -13,6 +14,7 @@ import java.util.*;
  * Implementation of the UserDAO interface that manages user data using a HashMap.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class UserDaoImpl implements UserDAO {
 
     private final ConnectionManager connectionProvider;
@@ -114,6 +116,7 @@ public class UserDaoImpl implements UserDAO {
                     Optional.of(buildUser(resultSet))
                     : Optional.empty();
         } catch (SQLException e) {
+            log.error("error fetching user with login " + login,e);
             return Optional.empty();
         }
     }
@@ -123,7 +126,6 @@ public class UserDaoImpl implements UserDAO {
      *
      * @param user The updated User object.
      * @return The updated User object.
-     * @throws  SQLException id user with such id not exist
      */
     @Override
     public User update(User user) {
@@ -145,7 +147,7 @@ public class UserDaoImpl implements UserDAO {
 
     /**
      * Constructs a User object from the given ResultSet.
-     *
+     * <p>
      * This method extracts the user details from the provided ResultSet and
      * constructs a User object using the extracted data.
      *
