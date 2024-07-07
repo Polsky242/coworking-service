@@ -23,12 +23,11 @@ public class WorkspaceDaoImplTest extends PostgresTestContainer {
     @BeforeEach
     public void setUp() {
         ConnectionManager connectionManager = new ConnectionManager(
-                container.getJdbcUrl(),
-                container.getUsername(),
-                container.getPassword()
-        );
-        LiquibaseInstance liquibaseTest = LiquibaseInstance.getInstance();
-        liquibaseTest.runMigrations(connectionManager.getConnection());
+                container.getJdbcUrl(), container.getUsername(), container.getPassword(),
+                "org.postgresql.Driver");
+
+        LiquibaseInstance liquibaseTest = new LiquibaseInstance(connectionManager.getConnection(), "db/changelog/changelog.xml", "migration");
+        liquibaseTest.runMigrations();
 
         workspaceDao = new WorkspaceDaoImpl(connectionManager);
     }

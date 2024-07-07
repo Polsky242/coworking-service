@@ -64,4 +64,21 @@
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet id="4" author="polsky">
+        <createTable schemaName="develop" tableName="audit">
+            <column name="id" type="bigint" defaultValueComputed="nextval('develop.audit_id_seq')" remarks="audit id">
+                <constraints primaryKey="true" primaryKeyName="audit_pkey" nullable="false"/>
+            </column>
+            <column name="login" type="varchar(255)" remarks="user login">
+                <constraints nullable="false"/>
+            </column>
+            <column name="audit_status" type="varchar(255)" remarks="status of action">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_type" type="varchar(255)" remarks="action type">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>

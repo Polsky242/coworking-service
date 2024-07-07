@@ -1,12 +1,14 @@
 package ru.polskiy.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import ru.polskiy.dao.UserDAO;
+import ru.polskiy.dao.UserDao;
+import ru.polskiy.dto.TokenResponse;
 import ru.polskiy.exception.AuthorizeException;
 import ru.polskiy.exception.NotValidArgumentException;
 import ru.polskiy.exception.RegisterException;
 import ru.polskiy.model.entity.User;
 import ru.polskiy.model.type.Role;
+import ru.polskiy.security.JwtTokenUtil;
 import ru.polskiy.service.SecurityService;
 
 import java.util.Optional;
@@ -18,7 +20,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SecurityServiceImpl implements SecurityService {
 
-    private final UserDAO userDAO;
+    private final UserDao userDAO;
+    private final JwtTokenUtil jwtTokenUtils;
 
     /**
      * Registers a new user with the provided login and password.
@@ -60,14 +63,17 @@ public class SecurityServiceImpl implements SecurityService {
      * @return an Optional containing the authorized user if successful, or empty if not
      */
     @Override
-    public Optional<User> authorize(String login, String password) {
-        Optional<User> user = userDAO.findByLogin(login);
-        if (user.isEmpty()) {
-            throw new AuthorizeException("Нет пользователя с таким логином");
+    public TokenResponse authorize(String login, String password) {
+        Optional<User> optionalUser = userDAO.findByLogin(login);
+        if (optionalUser.isEmpty()) {
+            throw new AuthorizeException("Пользователь с данным логином отсутствует в базе данных.");
         }
-        if (!user.get().getPassword().equals(password)) {
-            throw new AuthorizeException("Не правильный пароль");
+
+        if (!optionalUser.get().getPassword().equals(password)) {
+            throw new AuthorizeException("Неверный пароль.");
         }
-        return user;
+
+        String token = jwtTokenUtils.generateToken(login);
+        return new TokenResponse(token);
     }
 }

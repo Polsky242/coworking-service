@@ -1,11 +1,12 @@
 package ru.polskiy.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import ru.polskiy.dao.UserDAO;
+import ru.polskiy.dao.UserDao;
 import ru.polskiy.model.entity.User;
 import ru.polskiy.service.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserDAO userDAO;
+    private final UserDao userDAO;
 
     /**
      * Retrieves a user by their ID.
@@ -37,5 +38,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> showAll() {
         return userDAO.findAll();
+    }
+
+    @Override
+    public User getUserByLogin(String login) {
+        return userDAO.findByLogin(login)
+                .orElseThrow(() -> new NoSuchElementException("No user found with login: " + login));
     }
 }

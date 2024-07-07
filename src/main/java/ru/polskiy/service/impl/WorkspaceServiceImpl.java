@@ -1,17 +1,19 @@
 package ru.polskiy.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import ru.polskiy.dao.WorkspaceDAO;
+import ru.polskiy.annotations.Auditable;
+import ru.polskiy.dao.WorkspaceDao;
 import ru.polskiy.exception.DuplicateException;
 import ru.polskiy.exception.NoSuchWorkspaceException;
 import ru.polskiy.model.entity.Workspace;
+import ru.polskiy.model.type.ActionType;
+import ru.polskiy.service.UserService;
 import ru.polskiy.service.WorkspaceService;
+import ru.polskiy.service.WorkspaceTypeService;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -22,7 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WorkspaceServiceImpl implements WorkspaceService {
 
-    private final WorkspaceDAO workspaceDAO;
+    private final WorkspaceDao workspaceDAO;
+
 
     /**
      * Retrieves a list of available workspaces.
@@ -100,6 +103,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param workspaceId     the ID of the workspace to book
      */
     @Override
+    @Auditable(actionType = ActionType.SUBMIT_WORKSPACE, userId = "@userId")
     public void submitWorkspace(Long userId, Long workspaceTypeId, Long workspaceId) {
         Optional<Workspace> optionalWorkspace = workspaceDAO.findById(workspaceId);
         if (optionalWorkspace.isEmpty()) {
@@ -121,10 +125,22 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @return a list of workspaces booked by the user
      */
     @Override
+    @Auditable(actionType = ActionType.GETTING_WORKSPACES, userId = "@userId")
     public List<Workspace> getCurrentWorkspaces(Long userId) {
-        return workspaceDAO.findAll().stream()
-                .filter(entity -> Objects.equals(entity.getUserId(), userId))
-                .collect(Collectors.toList());
+        List<Workspace> workspaces = workspaceDAO.findAll();
+
+        Map<Long, List<Workspace>> workspaceByType = workspaces.stream()
+                .collect(Collectors.groupingBy(Workspace::getTypeId));
+
+        List<Workspace> lastWorkspaces = new ArrayList<>();
+
+        for (List<Workspace> workspaceList : workspaceByType.values()) {
+            if (!workspaceList.isEmpty()) {
+                Workspace lastWorkspace = workspaces.get(workspaces.size() - 1);
+                lastWorkspaces.add(lastWorkspace);
+            }
+        }
+        return lastWorkspaces;
     }
 
     /**
@@ -138,6 +154,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @return a list of workspaces matching the specified date and time
      */
     @Override
+    @Auditable(actionType = ActionType.GETTING_WORKSPACES, userId = "@userId")
     public List<Workspace> getWorkspacesByDate(Integer year, Integer month, Integer day, Integer hours, Integer minutes) {
         return getWorkspacesByDate(year, month, day).stream()
                 .filter(entity -> entity.getStartDate().getHour() == hours)
@@ -154,6 +171,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @return a list of workspaces matching the specified date
      */
     @Override
+    @Auditable(actionType = ActionType.GETTING_WORKSPACES, userId = "@userId")
     public List<Workspace> getWorkspacesByDate(Integer year, Integer month, Integer day) {
         return getAvailableWorkspaces().stream()
                 .filter(entity -> entity.getStartDate().getYear() == year)
@@ -169,6 +187,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param workspace the workspace to cancel the booking for
      */
     @Override
+    @Auditable(actionType = ActionType.CANCEL_WORKSPACE, userId = "@userId")
     public void cancelBook(Long userId, Workspace workspace) {
         List<Workspace> allUserWorkspaces = getCurrentWorkspaces(userId);
         for (Workspace entity : allUserWorkspaces) {

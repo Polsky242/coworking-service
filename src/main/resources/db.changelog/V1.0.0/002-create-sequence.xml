@@ -8,5 +8,6 @@
         <createSequence schemaName="develop" cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807" minValue="1" sequenceName="user_id_seq" startValue="1"/>
         <createSequence schemaName="develop" cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807" minValue="1" sequenceName="workspace_type_id_seq" startValue="1"/>
         <createSequence schemaName="develop" cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807" minValue="1" sequenceName="workspace_id_seq" startValue="1"/>
+        <createSequence schemaName="develop" cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807" minValue="1" sequenceName="audit_id_seq" startValue="1"/>
     </changeSet>
 </databaseChangeLog>
