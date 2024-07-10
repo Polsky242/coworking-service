@@ -2,7 +2,7 @@ package ru.polskiy.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.polskiy.dao.WorkspaceDAO;
+import ru.polskiy.dao.WorkspaceDao;
 import ru.polskiy.model.entity.Workspace;
 import ru.polskiy.util.ConnectionManager;
 
@@ -14,7 +14,7 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class WorkspaceDaoImpl implements WorkspaceDAO {
+public class WorkspaceDaoImpl implements WorkspaceDao {
 
     private final ConnectionManager connectionProvider;
 
@@ -154,6 +154,25 @@ public class WorkspaceDaoImpl implements WorkspaceDAO {
         } catch (SQLException e) {
             log.error("Ошибка при выполнении SQL-запроса: " + e.getMessage());
             return null;
+        }
+    }
+
+    @Override
+    public List<Workspace> findAllByUserId(Long userId) {
+        String sqlFindAllByUserId = """
+                SELECT * FROM develop.workspace WHERE user_id = ?
+                """;
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlFindAllByUserId)) {
+            preparedStatement.setLong(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Workspace> result = new ArrayList<>();
+            while (resultSet.next()) {
+                result.add(buildWorkspace(resultSet));
+            }
+            return result;
+        } catch (SQLException e) {
+            return Collections.emptyList();
         }
     }
 

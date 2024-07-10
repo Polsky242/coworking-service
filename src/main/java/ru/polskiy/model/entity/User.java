@@ -11,7 +11,6 @@ import ru.polskiy.model.type.Role;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User extends BaseEntity {
 
     /**
@@ -32,16 +31,16 @@ public class User extends BaseEntity {
     /**
      * The login username of the user.
      */
-    String login;
+    private String login;
 
     /**
      * The password associated with the user's login.
      */
-    String password;
+    private String password;
 
     /**
      * The role of the user, defaults to Role.USER if not specified during construction.
      */
     @Builder.Default
-    Role role = Role.USER;
+    private Role role = Role.USER;
 }

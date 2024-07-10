@@ -11,21 +11,27 @@ import java.sql.DriverManager;
  */
 public class ConnectionManager {
 
-    private final String url;
+    private final String URL;
     private final String username;
     private final String password;
 
     /**
      * Constructs a ConnectionManager with the specified database URL, username, and password.
      *
-     * @param url The URL of the database.
+     * @param URL The URL of the database.
      * @param username The username for the database connection.
      * @param password The password for the database connection.
      */
-    public ConnectionManager(String url, String username, String password) {
-        this.url = url;
+    public ConnectionManager(String URL, String username, String password, String driver) {
+        this.URL = URL;
         this.username = username;
         this.password = password;
+
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -39,7 +45,7 @@ public class ConnectionManager {
      */
     public Connection getConnection() {
         try {
-            return DriverManager.getConnection(url, username, password);
+            return DriverManager.getConnection(URL, username, password);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

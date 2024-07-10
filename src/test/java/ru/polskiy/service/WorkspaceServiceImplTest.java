@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.polskiy.dao.WorkspaceDAO;
+import ru.polskiy.dao.WorkspaceDao;
 import ru.polskiy.exception.DuplicateException;
 import ru.polskiy.exception.NoSuchWorkspaceException;
 import ru.polskiy.model.entity.User;
@@ -26,7 +26,7 @@ public class WorkspaceServiceImplTest {
     private WorkspaceServiceImpl workspaceService;
 
     @Mock
-    private WorkspaceDAO workspaceDAO;
+    private WorkspaceDao workspaceDAO;
 
     @Test
     void getCurrentWorkspaces() {

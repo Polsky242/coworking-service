@@ -1,7 +1,7 @@
 package ru.polskiy.dao.impl;
 
 import lombok.RequiredArgsConstructor;
-import ru.polskiy.dao.WorkspaceTypeDAO;
+import ru.polskiy.dao.WorkspaceTypeDao;
 import ru.polskiy.model.entity.WorkspaceType;
 import ru.polskiy.util.ConnectionManager;
 
@@ -12,7 +12,7 @@ import java.util.*;
  * Implementation of the WorkspaceTypeDAO interface that manages workspace types using a HashMap.
  */
 @RequiredArgsConstructor
-public class WorkspaceTypeDaoImpl implements WorkspaceTypeDAO {
+public class WorkspaceTypeDaoImpl implements WorkspaceTypeDao {
 
     private final ConnectionManager connectionProvider;
 
