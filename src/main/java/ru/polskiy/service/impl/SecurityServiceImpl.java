@@ -13,25 +13,12 @@ import ru.polskiy.service.SecurityService;
 
 import java.util.Optional;
 
-/**
- * Service implementation for security operations.
- * This class provides methods to handle user registration and authorization.
- */
 @RequiredArgsConstructor
 public class SecurityServiceImpl implements SecurityService {
 
     private final UserDao userDAO;
     private final JwtTokenUtil jwtTokenUtils;
 
-    /**
-     * Registers a new user with the provided login and password.
-     * Throws NotValidArgumentException if the login or password is invalid.
-     * Throws RegisterException if a user with the same login already exists.
-     *
-     * @param login    the login for the new user
-     * @param password the password for the new user
-     * @return the registered user
-     */
     @Override
     public User register(String login, String password) {
         if (login == null || password == null || login.isEmpty()
@@ -54,14 +41,6 @@ public class SecurityServiceImpl implements SecurityService {
         return userDAO.save(newUser);
     }
 
-    /**
-     * Authorizes a user with the provided login and password.
-     * Throws AuthorizeException if the login is not found or the password is incorrect.
-     *
-     * @param login    the login of the user
-     * @param password the password of the user
-     * @return an Optional containing the authorized user if successful, or empty if not
-     */
     @Override
     public TokenResponse authorize(String login, String password) {
         Optional<User> optionalUser = userDAO.findByLogin(login);

@@ -14,7 +14,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Workspace extends BaseEntity {
 
     /**
@@ -38,20 +37,20 @@ public class Workspace extends BaseEntity {
      * The identifier of the user associated with the workspace.
      */
     @Builder.Default
-    Long userId = null;
+    private Long userId = null;
 
     /**
      * The date and time when the workspace starts.
      */
-    LocalDateTime startDate;
+    private LocalDateTime startDate;
 
     /**
      * The date and time when the workspace ends.
      */
-    LocalDateTime endDate;
+    private LocalDateTime endDate;
 
     /**
      * The identifier of the type associated with the workspace.
      */
-    Long typeId;
+    private Long typeId;
 }

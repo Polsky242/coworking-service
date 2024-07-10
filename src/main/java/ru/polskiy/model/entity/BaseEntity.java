@@ -11,23 +11,22 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseEntity {
 
     /**
      * The unique identifier for the entity.
      */
-    Long id;
+    private Long id;
 
     /**
      * The date and time when the entity was created.
      */
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     /**
      * The date and time when the entity was last updated.
      */
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     /**
      * Constructs a BaseEntity with the specified id.

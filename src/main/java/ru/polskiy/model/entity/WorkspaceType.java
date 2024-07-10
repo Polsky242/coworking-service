@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class WorkspaceType extends BaseEntity {
 
     /**
@@ -29,5 +28,5 @@ public class WorkspaceType extends BaseEntity {
     /**
      * The name of the workspace type.
      */
-    String typeName;
+    private String typeName;
 }

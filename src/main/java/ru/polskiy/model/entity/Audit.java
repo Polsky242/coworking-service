@@ -9,14 +9,9 @@ import ru.polskiy.model.type.AuditStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Audit {
-
-    Long id;
-
-    String login;
-
-    AuditStatus auditStatus;
-
-    ActionType actionType;
+    private Long id;
+    private String login;
+    private AuditStatus auditStatus;
+    private ActionType actionType;
 }

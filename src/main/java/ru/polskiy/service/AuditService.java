@@ -6,6 +6,10 @@ import ru.polskiy.model.type.AuditStatus;
 
 import java.util.List;
 
+/**
+ * Interface representing an audit service.
+ * This service is responsible for performing and managing audit operations.
+ */
 public interface AuditService {
 
     /**
