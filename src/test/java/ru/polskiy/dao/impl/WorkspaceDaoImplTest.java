@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.polskiy.conteiners.PostgresTestContainer;
-import ru.polskiy.liquibase.LiquibaseInstance;
 import ru.polskiy.model.entity.Workspace;
 import ru.polskiy.util.ConnectionManager;
 
@@ -22,12 +21,10 @@ public class WorkspaceDaoImplTest extends PostgresTestContainer {
 
     @BeforeEach
     public void setUp() {
-        ConnectionManager connectionManager = new ConnectionManager(
+        ConnectionManager connectionManager = new ConnectionManager();
+        connectionManager.getConnection(
                 container.getJdbcUrl(), container.getUsername(), container.getPassword(),
                 "org.postgresql.Driver");
-
-        LiquibaseInstance liquibaseTest = new LiquibaseInstance(connectionManager.getConnection(), "db/changelog/changelog.xml", "migration");
-        liquibaseTest.runMigrations();
 
         workspaceDao = new WorkspaceDaoImpl(connectionManager);
     }
