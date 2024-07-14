@@ -25,6 +25,4 @@ public class WorkspaceDto {
      * The ID of the workspace type.
      */
     private Long typeId;
-
-    // Constructors, getters, setters, and other methods can be added here if needed
 }

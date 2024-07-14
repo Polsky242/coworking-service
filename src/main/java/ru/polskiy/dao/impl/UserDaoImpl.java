@@ -2,6 +2,7 @@ package ru.polskiy.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 import ru.polskiy.dao.UserDao;
 import ru.polskiy.model.entity.User;
 import ru.polskiy.model.type.Role;
@@ -15,6 +16,7 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Slf4j
+@Repository
 public class UserDaoImpl implements UserDao {
 
     private final ConnectionManager connectionProvider;
