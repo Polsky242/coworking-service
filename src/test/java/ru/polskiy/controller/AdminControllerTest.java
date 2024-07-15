@@ -26,13 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AdminControllerTest {
     @InjectMocks
     private AdminController adminController;
-
     @Mock
     private UserService userService;
-
     @Mock
     private WorkspaceTypeService workspaceTypeService;
-
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -47,7 +44,7 @@ public class AdminControllerTest {
         List<User> users = Collections.singletonList(new User());
         when(userService.showAll()).thenReturn(users);
 
-        mockMvc.perform(get("/admin/all-users")
+        mockMvc.perform(get("api/v1/admin/users")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }

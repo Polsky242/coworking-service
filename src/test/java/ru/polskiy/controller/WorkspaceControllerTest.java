@@ -19,6 +19,7 @@ import ru.polskiy.model.entity.Workspace;
 import ru.polskiy.service.WorkspaceService;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -33,18 +34,15 @@ public class WorkspaceControllerTest {
 
     @Mock
     private WorkspaceService workspaceService;
-
     @Mock
     private UserDao userDao;
-
     @InjectMocks
     private WorkspaceController workspaceController;
-
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(workspaceController).build();
 
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -56,7 +54,7 @@ public class WorkspaceControllerTest {
     @Test
     public void testGetCurrentWorkspaces() throws Exception {
         when(userDao.findByLogin(any())).thenReturn(Optional.of(new User()));
-        when(workspaceService.getCurrentWorkspaces(anyLong())).thenReturn(Arrays.asList(new Workspace()));
+        when(workspaceService.getCurrentWorkspaces(anyLong())).thenReturn(List.of(new Workspace()));
 
         mockMvc.perform(get("/api/v1/workspace/current")
                         .param("login", "testLogin")

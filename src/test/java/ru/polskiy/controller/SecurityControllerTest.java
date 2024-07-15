@@ -20,13 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class SecurityControllerTest {
 
-
     @InjectMocks
     private SecurityController securityController;
-
     @Mock
     private SecurityService securityService;
-
     private MockMvc mockMvc;
 
     @BeforeEach
