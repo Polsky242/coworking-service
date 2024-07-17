@@ -3,6 +3,7 @@ package ru.polskiy.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.polskiy.dao.UserDao;
@@ -39,9 +40,10 @@ public class WorkspaceController {
      */
     @ApiOperation(value = "Get current workspaces", response = List.class)
     @GetMapping("/current")
-    public ResponseEntity<List<Workspace>> getCurrentWorkspaces(
-            @RequestParam String login) {
-        if (!SecurityUtils.isValidLogin(login)) throw new AuthorizeException("Incorrect login!");
+    public ResponseEntity<List<Workspace>> getCurrentWorkspaces(@RequestParam String login) {
+        if (!SecurityUtils.isValidLogin(login)){
+            throw new AuthorizeException("Incorrect login!");
+        }
         Long id = getIdByLogin(login);
         return ResponseEntity.ok(workspaceService.getCurrentWorkspaces(id));
     }
@@ -74,13 +76,15 @@ public class WorkspaceController {
      */
     @ApiOperation(value = "submit workspace", response = String.class)
     @PostMapping("/submit")
-    public ResponseEntity<String> submitWorkspace(
+    public ResponseEntity<Void> submitWorkspace(
             @RequestBody WorkspaceRequest request,
             @RequestParam String login) {
-        if (!SecurityUtils.isValidLogin(login)) throw new AuthorizeException("Incorrect login!");
+        if (!SecurityUtils.isValidLogin(login)){
+            throw new AuthorizeException("Incorrect login!");
+        }
         Long id = getIdByLogin(login);
         workspaceService.submitWorkspace(id, request.workspaceTypeId(), request.workspaceId());
-        return ResponseEntity.ok("The workspace was successfully saved!");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -102,11 +106,8 @@ public class WorkspaceController {
      * @throws UserNotFoundException if the user is not found.
      */
     private Long getIdByLogin(String login) {
-        Optional<User> userOptional = userDao.findByLogin(login);
-        if (userOptional.isPresent()) {
-            return userOptional.get().getId();
-        } else {
-            throw new UserNotFoundException("User not found for login: " + login);
-        }
+        return userDao.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException("User not found for login:%s".formatted(login)))
+                .getId();
     }
 }

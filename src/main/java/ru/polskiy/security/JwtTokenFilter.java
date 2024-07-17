@@ -14,7 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -41,7 +40,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                    username, null, jwtTokenUtils.extractRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
+                    username, null, jwtTokenUtils.extractRoles(jwt).stream().map(SimpleGrantedAuthority::new).toList()
             );
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }

@@ -16,7 +16,9 @@ public class SecurityUtils {
             securityContext = SecurityContextHolder.getContext();
         }
         Authentication authentication = securityContext.getAuthentication();
-        if (authentication == null) throw new AuthorizeException("Unauthorized!");
+        if (authentication == null){
+            throw new AuthorizeException("Unauthorized!");
+        }
         User principal = (User) authentication.getPrincipal();
         return principal.getLogin().equals(login);
     }
