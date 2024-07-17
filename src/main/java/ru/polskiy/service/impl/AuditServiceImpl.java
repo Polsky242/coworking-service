@@ -1,6 +1,7 @@
 package ru.polskiy.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.polskiy.dao.AuditDao;
 import ru.polskiy.model.entity.Audit;
 import ru.polskiy.model.type.ActionType;
@@ -9,6 +10,7 @@ import ru.polskiy.service.AuditService;
 
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class AuditServiceImpl implements AuditService {
 

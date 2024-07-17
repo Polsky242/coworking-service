@@ -24,7 +24,7 @@ public class AuditAspect {
     }
 
     @Around("annotatedByAuditable()")
-    public Audit audit(ProceedingJoinPoint pjp) {
+    public Object audit(ProceedingJoinPoint pjp) {
         var methodSignature = (MethodSignature) pjp.getSignature();
 
         Auditable audit = methodSignature.getMethod().getAnnotation(Auditable.class);
@@ -36,7 +36,7 @@ public class AuditAspect {
         return auditService.audit(payload, actionType, AuditStatus.SUCCESS);
     }
 
-    @AfterThrowing(pointcut = "auditPointcut() && @annotation(audit)")
+    @AfterThrowing(pointcut = "annotatedByAuditable() && @annotation(ru.polskiy.annotations.Auditable)")
     public void auditFailure(ProceedingJoinPoint pjp) {
         var methodSignature = (MethodSignature) pjp.getSignature();
 

@@ -1,77 +1,97 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
-    id 'io.freefair.lombok' version '8.0.1'
     id 'java'
     id 'war'
 }
 
+group = 'ru.polskiy'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 ext {
+    javaxVersion = '3.1.0'
+    javaxAnnotationVersion = '1.3.2'
+    springVersion = '5.3.32'
+    springSecurityVersion = '5.7.5'
     lombokVersion = '1.18.30'
-    mapstructVersion = '1.5.5.Final'
+    pluginWarVersion = '3.3.1'
+    pluginAspectjVersion = '1.14.0'
     jacksonVersion = '2.16.1'
     jjwtVersion = '0.12.5'
+    springfoxVersion = '3.0.0'
+    mapstructVersion = '1.5.5.Final'
+    log4jVersion = '2.22.1'
     aspectjVersion = '1.9.21'
-    junitVersion = '5.10.1'
-    mockitoVersion = '5.6.0'
-    postgresqlVersion = '42.7.1'
-    liquibaseVersion = '4.25.1'
+    junitJupiterVersion = '5.10.1'
+    mockitoVersion = '5.10.0'
+    testcontainersJUnitVersion = '1.19.1'
+    postgresqlVersion = '42.7.2'
+    liquibaseCoreVersion = '4.25.1'
     testcontainersVersion = '1.19.4'
-    jakartaServletVersion = '6.0.0'
-    log4jVersion = '2.20.0'
-    aspectjPluginVersion = '1.14.0'
-    warPluginVersion = '3.3.1'
-    compilerPluginVersion = '3.11.0'
+    jsr310Version = '2.16.1'
 }
 
 dependencies {
+    implementation "org.springframework:spring-core:${springVersion}"
+    implementation "org.springframework:spring-context:${springVersion}"
+    implementation "org.springframework:spring-webmvc:${springVersion}"
+    implementation "org.springframework:spring-aop:${springVersion}"
+    implementation "org.springframework:spring-aspects:${springVersion}"
+    implementation "org.springframework:spring-tx:${springVersion}"
+    implementation "org.springframework:spring-jdbc:${springVersion}"
+    providedCompile "javax.servlet:javax.servlet-api:${javaxVersion}"
+    implementation "javax.annotation:javax.annotation-api:${javaxAnnotationVersion}"
+    implementation "org.springframework.security:spring-security-core:${springSecurityVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jsr310Version}"
+    implementation "org.springframework.security:spring-security-web:${springSecurityVersion}"
+    implementation "org.springframework.security:spring-security-config:${springSecurityVersion}"
+    testImplementation "org.springframework:spring-test:${springVersion}"
+    implementation "io.springfox:springfox-swagger2:${springfoxVersion}"
+    implementation "io.springfox:springfox-swagger-ui:${springfoxVersion}"
+    implementation "io.springfox:springfox-oas:${springfoxVersion}"
     implementation "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     implementation "org.aspectj:aspectjrt:${aspectjVersion}"
+    implementation "org.aspectj:aspectjtools:${aspectjVersion}"
+    implementation "io.jsonwebtoken:jjwt:${jjwtVersion}"
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-    implementation "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-    implementation "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-    implementation "jakarta.servlet:jakarta.servlet-api:${jakartaServletVersion}"
-    implementation "org.postgresql:postgresql:${postgresqlVersion}"
-    implementation "org.liquibase:liquibase-core:${liquibaseVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
-
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    implementation "org.postgresql:postgresql:${postgresqlVersion}"
+    implementation "org.liquibase:liquibase-core:${liquibaseCoreVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"  // Add this line
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-    testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
-    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-}
-
-group = 'ru.polskiy'
-version = '1.0-SNAPSHOT'
-description = 'coworking-service'
-java.sourceCompatibility = JavaVersion.VERSION_17
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
+    testImplementation "org.testcontainers:junit-jupiter:${testcontainersJUnitVersion}"
+    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
 }
 
 tasks.withType(JavaCompile) {
-    options.annotationProcessorPath = configurations.annotationProcessor
     options.encoding = 'UTF-8'
+    options.annotationProcessorPath = configurations.annotationProcessor
 }
 
-tasks.withType(Javadoc) {
-    options.encoding = 'UTF-8'
-}
 war {
-    enabled = true
-    archiveBaseName.set('coworking-service')
+    archiveVersion = ''
+    archiveFileName = 'coworking-service.war'
+}
+
+configurations {
+    providedCompile
+}
+
+test {
+    useJUnitPlatform()
 }

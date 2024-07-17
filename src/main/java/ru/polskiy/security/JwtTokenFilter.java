@@ -1,53 +1,51 @@
 package ru.polskiy.security;
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.annotation.WebInitParam;
-import jakarta.servlet.http.HttpServletRequest;
+import io.jsonwebtoken.ExpiredJwtException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
-@WebFilter(urlPatterns = "/*", initParams = @WebInitParam(name = "order", value = "1"))
-public class JwtTokenFilter implements Filter{
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class JwtTokenFilter extends OncePerRequestFilter {
     private JwtTokenUtil jwtTokenUtils;
-    private ServletContext servletContext;
 
-    /**
-     * Initializes the filter.
-     *
-     * @param filterConfig the filter configuration
-     * @throws ServletException if an error occurs during initialization
-     */
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        this.servletContext = filterConfig.getServletContext();
-        jwtTokenUtils = (JwtTokenUtil) servletContext.getAttribute("jwtTokenUtils");
-    }
 
-    /**
-     * Checks for the presence of a JWT in the Authorization header of the incoming request.
-     * If a valid JWT is found, it authenticates the user and stores the authentication in the servlet context.
-     * If no JWT is found or the JWT is invalid, it stores an unauthenticated Authentication object in the servlet context.
-     *
-     * @param servletRequest the incoming request
-     * @param servletResponse the outgoing response
-     * @param filterChain the filter chain
-     * @throws IOException if an I/O error occurs during this filter's processing of the request
-     * @throws ServletException if the processing fails for any other reason
-     */
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        String bearerToken = ((HttpServletRequest) servletRequest).getHeader("Authorization");
-        try {
-            if (bearerToken != null && bearerToken.startsWith("Bearer ") && jwtTokenUtils.validateToken(bearerToken.substring(7))) {
-                Auth authentication = jwtTokenUtils.authentication(bearerToken.substring(7));
-                servletContext.setAttribute("authentication", authentication);
-            } else {
-                servletContext.setAttribute("authentication", new Auth(null, null, false, "Bearer token is null or invalid!"));
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
+        String username = null;
+        String jwt = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+
+            try {
+                username = jwtTokenUtils.extractLogin(jwt);
+            } catch (ExpiredJwtException exception) {
+                log.debug("the token's lifetime has expired.");
             }
-        } catch (RuntimeException e) {
-            servletContext.setAttribute("authentication", new Auth(null, null, false, e.getMessage()));
         }
-        filterChain.doFilter(servletRequest, servletResponse);
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                    username, null, jwtTokenUtils.extractRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
+            );
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        }
+
+        filterChain.doFilter(request, response);
     }
 }

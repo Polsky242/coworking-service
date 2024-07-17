@@ -1,6 +1,7 @@
 package ru.polskiy.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.polskiy.dao.UserDao;
 import ru.polskiy.model.entity.User;
 import ru.polskiy.service.UserService;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 

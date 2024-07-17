@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.polskiy.conteiners.PostgresTestContainer;
-import ru.polskiy.liquibase.LiquibaseInstance;
 import ru.polskiy.model.entity.User;
 import ru.polskiy.model.type.Role;
 import ru.polskiy.util.ConnectionManager;
@@ -15,18 +14,17 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@DisplayName("user dao implementation test")
 public class UserDaoImplTest extends PostgresTestContainer {
 
     private UserDaoImpl userDao;
 
     @BeforeEach
     public void setUp() {
-        ConnectionManager connectionManager = new ConnectionManager(
+        ConnectionManager connectionManager = new ConnectionManager();
+        connectionManager.getConnection(
                 container.getJdbcUrl(), container.getUsername(), container.getPassword(),
                 "org.postgresql.Driver");
-
-        LiquibaseInstance liquibaseTest = new LiquibaseInstance(connectionManager.getConnection(), "db/changelog/changelog.xml", "migration");
-        liquibaseTest.runMigrations();
 
         userDao = new UserDaoImpl(connectionManager);
     }

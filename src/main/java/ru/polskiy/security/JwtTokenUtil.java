@@ -7,6 +7,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import ru.polskiy.model.entity.User;
 import ru.polskiy.service.UserService;
 
@@ -14,50 +18,41 @@ import javax.crypto.SecretKey;
 import java.nio.file.AccessDeniedException;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@RequiredArgsConstructor
+@Component
 public class JwtTokenUtil {
 
-    private final String secret;
-    private final Duration jwtLifetime;
-    private final UserService userService;
+    @Value("${jwt.secret}")
+    private String secret;
+    @Value("${jwt.lifetime}")
+    private Duration jwtLifetime;
 
     /**
      * Generates a JWT for the given login.
      *
-     * @param login the login for which to generate the JWT
+     * @param userDetails the login for which to generate the JWT
      * @return the generated JWT
      */
-    public String generateToken(String login) {
-        ClaimsBuilder claimsBuilder = Jwts.claims().subject(login);
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        List<String> rolesList = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        claims.put("roles", rolesList);
+
         Date issuedDate = new Date();
         Date expiredDate = new Date(issuedDate.getTime() + jwtLifetime.toMillis());
 
         return Jwts.builder()
-                .claims(claimsBuilder.build())
-                .subject(login)
+                .claims(claims)
+                .subject(userDetails.getUsername())
                 .issuedAt(issuedDate)
                 .expiration(expiredDate)
                 .signWith(signKey())
                 .compact();
-    }
-
-    /**
-     * Authenticates a user based on the given JWT.
-     *
-     * @param token the JWT to authenticate
-     * @return the authentication result
-     * @throws AccessDeniedException if the JWT is invalid or the user does not exist
-     */
-    public Auth authentication(String token) throws AccessDeniedException {
-        if (!validateToken(token)) {
-            throw new AccessDeniedException("Access denied: Invalid token");
-        }
-
-        String login = extractLogin(token);
-        User user = userService.getUserByLogin(login);
-
-        return new Auth(login, user.getRole(), true, "Successful login");
     }
 
     /**
@@ -85,19 +80,17 @@ public class JwtTokenUtil {
     }
 
     /**
-     * Validates the given JWT.
+     * Extracts the roles from the given JWT token.
      *
-     * @param token the JWT to validate
-     * @return true if the JWT is valid, false otherwise
-     * @throws RuntimeException if the JWT is invalid
+     * This method extracts all claims from the provided JWT token and retrieves the "roles" claim,
+     * which is expected to be a list of strings. If the "roles" claim is not present or is not of
+     * the expected type, this method may throw an exception.
+     *
+     * @param token the JWT token from which to extract the roles.
+     * @return a list of roles extracted from the token.
      */
-    public boolean validateToken(String token) throws RuntimeException {
-        Jws<Claims> claims = Jwts.parser()
-                .verifyWith(signKey())
-                .build()
-                .parseSignedClaims(token);
-
-        return !claims.getPayload().getExpiration().before(new Date());
+    public List<String> extractRoles(String token) {
+        return extractAllClaims(token).get("roles", List.class);
     }
 
     /**

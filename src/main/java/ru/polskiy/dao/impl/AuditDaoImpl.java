@@ -2,6 +2,7 @@ package ru.polskiy.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 import ru.polskiy.dao.AuditDao;
 import ru.polskiy.model.entity.Audit;
 import ru.polskiy.model.type.ActionType;
@@ -13,8 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@link AuditDao} interface.
+ * Provides methods for performing CRUD operations on audit records.
+ * This class interacts with the database to manage audit information.
+ */
 @Slf4j
 @RequiredArgsConstructor
+@Repository
 public class AuditDaoImpl implements AuditDao {
 
     private final ConnectionManager connectionProvider;

@@ -1,6 +1,7 @@
 package ru.polskiy.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.polskiy.annotations.Auditable;
 import ru.polskiy.dao.WorkspaceDao;
 import ru.polskiy.exception.DuplicateException;
@@ -8,10 +9,13 @@ import ru.polskiy.exception.NoSuchWorkspaceException;
 import ru.polskiy.model.entity.Workspace;
 import ru.polskiy.model.type.ActionType;
 import ru.polskiy.service.WorkspaceService;
+import ru.polskiy.service.WorkspaceTypeService;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class WorkspaceServiceImpl implements WorkspaceService {
 
@@ -22,6 +26,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         List<Workspace> all = workspaceDAO.findAll();
         return all.stream()
                 .filter(workspace -> workspace.getUserId() == 0)
+                .filter(workspace -> workspace.getStartDate().isAfter(LocalDateTime.now()))
                 .collect(Collectors.toList());
     }
 

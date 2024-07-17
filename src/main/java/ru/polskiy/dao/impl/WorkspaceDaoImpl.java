@@ -2,6 +2,7 @@ package ru.polskiy.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 import ru.polskiy.dao.WorkspaceDao;
 import ru.polskiy.model.entity.Workspace;
 import ru.polskiy.util.ConnectionManager;
@@ -14,6 +15,7 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Slf4j
+@Repository
 public class WorkspaceDaoImpl implements WorkspaceDao {
 
     private final ConnectionManager connectionProvider;
